@@ -91,17 +91,17 @@ const handler = async (msg, { conn }) => {
 ┗━━━━━━━━━━━━━
 
 ━━━━━━━━━━━━━━━━━━━━━━
-📍 grupo del bot https://chat.whatsapp.com/IN2dNxVceScLqXQCGEq5dY
+📍 grupo oficial del bot https://chat.whatsapp.com/IN2dNxVceScLqXQCGEq5dY
 🎨 𝗠𝗲𝗻𝘂́ 𝗽𝗲𝗿𝘀𝗼𝗻𝗮𝗹𝗶𝘇𝗮𝗱𝗼 𝗽𝗼𝗿 𝗲𝗹 𝘂𝘀𝘂𝗮𝗿𝗶𝗼
 `.trim();
     } else {
       // MENÚ POR DEFECTO NORMALITO
       caption = `
-╔⌬ ${ nombre }⌬╗
+╔⌬ ${nombreMenu}⌬╗
 ║   Menú por categorías  
 ╚═──────────────────═╝
-— 🔹 usa: 
-✦ ${usedPrefix}menu  
+— 🔹  usa: 
+✦ ${usedPrefix}menu 
 — 🔹 veras todo lo que ocupas saber.
 
 〔 👇Haz Que Tus Amigos Sean *SUBBOTS* También Diles Que Envíen Estos Comandos👇 〕
@@ -188,7 +188,7 @@ const handler = async (msg, { conn }) => {
 ▣ ${usedPrefix}delmenu ↷
   quita lo personalizado
 
-🫶🏻 grupo del bot https://chat.whatsapp.com/IN2dNxVceScLqXQCGEq5dY
+  🫶🏻 grupo del bot https://chat.whatsapp.com/IN2dNxVceScLqXQCGEq5dY
 
 ═⌬ M-STER ULTRA  Subbot ⌬═`.trim();
     }
@@ -196,7 +196,7 @@ const handler = async (msg, { conn }) => {
     await conn.sendMessage(
       msg.key.remoteJid,
       {
-        image: imageBuffer ? imageBuffer : { url: `https://cdn.russellxz.click/afdc7aae.jpeg` },
+        image: imageBuffer ? imageBuffer : { url: `https://cdn.russellxz.click/87f31e3b.jpeg` },
         caption,
       },
       { quoted: msg }
