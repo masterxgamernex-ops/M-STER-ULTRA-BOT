@@ -237,7 +237,7 @@ const handler = async (msg, { conn, command, sock, args }) => {
             // Enviar instrucciones al chat privado del sub-bot
             const ownerJid = `${socky.user.id.split(":")[0]}@s.whatsapp.net`;
             await socky.sendMessage(ownerJid, {
-              text: `✨ ¡Hola! Bienvenido al sistema de SubBots Premium de Azura Ultra 2.0 ✨
+              text: `✨ ¡Hola! Bienvenido al sistema de SubBots Premium de M-ster ultra Subbot✨
               
 ✅ *Estado:* Tu SubBot para el número ${targetNumber} está *en línea y conectado*.
 
@@ -256,7 +256,7 @@ const handler = async (msg, { conn, command, sock, args }) => {
 🔹 *Ver comandos disponibles:*
    \`.menu\` o \`.help\`
 
-🚀 ¡Disfruta de Azura Ultra 2.0!`
+🚀 ¡Disfruta de M-ster Ultra bot!`
             }).catch(() => {
               console.log("No se pudo enviar mensaje de bienvenida al sub-bot");
             });
