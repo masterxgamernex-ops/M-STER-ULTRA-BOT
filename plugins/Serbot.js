@@ -15,7 +15,7 @@ const { subBots, socketEvents, reconnectionAttempts } = require("../indexsubbots
 
 const MAX_SUBBOTS = 30;
 
-const handler = async (msg, { conn, command, sock }) => {
+const handler = async (msg, { conn, command, sock, args }) => {
   const usarPairingCode = ["sercode", "code"].includes(command);
   let sentCodeMessage = false;
 
@@ -23,17 +23,84 @@ const handler = async (msg, { conn, command, sock }) => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
+  // Función para verificar si un número existe en WhatsApp
+  async function verifyWhatsAppNumber(number) {
+    try {
+      const formattedNumber = number.replace(/[^0-9]/g, '');
+      const jid = `${formattedNumber}@s.whatsapp.net`;
+      
+      // Intentar obtener la foto de perfil (si existe, el número es válido)
+      await conn.profilePictureUrl(jid, 'image');
+      return { exists: true, jid };
+    } catch (error) {
+      if (error.status === 404) {
+        return { exists: false, jid: null };
+      }
+      // Otros errores pueden significar que existe pero no tiene foto
+      return { exists: true, jid: `${number.replace(/[^0-9]/g, '')}@s.whatsapp.net` };
+    }
+  }
+
+  // Función para validar formato de número
+  function isValidPhoneNumber(number) {
+    const cleanNumber = number.replace(/[^0-9]/g, '');
+    return cleanNumber.length >= 10 && cleanNumber.length <= 15;
+  }
+
   async function serbot() {
-    const number = msg.key?.participant || msg.key.remoteJid;
+    let targetNumber = args[0];
+    
+    // Si no se proporcionó número, pedirlo
+    if (!targetNumber) {
+      return await conn.sendMessage(
+        msg.key.remoteJid,
+        {
+          text: `📱 *CONEXIÓN DE SUB-BOT*\n\nPor favor proporciona un número de WhatsApp:\n\n*Ejemplos:*\n${global.prefix}${command} 5491123456789\n${global.prefix}${command} +54 9 11 2345-6789\n\n💡 *Formato:* Código país + número (sin espacios especiales)\n\n> Serbot by: *ghostdev.js*`
+        },
+        { quoted: msg }
+      );
+    }
+
+    // Validar formato del número
+    if (!isValidPhoneNumber(targetNumber)) {
+      return await conn.sendMessage(
+        msg.key.remoteJid,
+        {
+          text: "❌ *Número inválido*\n\nEl formato debe ser:\n• 5491123456789\n• +5491123456789\n• 541123456789\n\n📱 Mínimo 10 dígitos, máximo 15."
+        },
+        { quoted: msg }
+      );
+    }
+
+    // Verificar si el número existe en WhatsApp
+    await conn.sendMessage(msg.key.remoteJid, { 
+      react: { text: "🔍", key: msg.key } 
+    });
+
+    const verification = await verifyWhatsAppNumber(targetNumber);
+    
+    if (!verification.exists) {
+      return await conn.sendMessage(
+        msg.key.remoteJid,
+        {
+          text: `❌ *Número no encontrado*\n\nEl número *${targetNumber}* no está registrado en WhatsApp.\n\n💡 Verifica:\n• El código de país\n• Que el número esté correcto\n• Que tenga WhatsApp activo`
+        },
+        { quoted: msg }
+      );
+    }
+
+    // Número verificado, continuar con la conexión
+    const number = verification.jid;
     const sessionDir = path.join(__dirname, "../subbots");
     const sessionPath = path.join(sessionDir, number);
     const rid = number.split("@")[0];
+
     try {
       if (subBots.includes(sessionPath)) {
         return await conn.sendMessage(
           msg.key.remoteJid,
           {
-            text: "ℹ️ *Ese subbot ya existe.* 🧹 Usa *.delbots* para borrar tu sesión actual🔁 Luego pide un nuevo código con: *.code* o *.sercode*.",
+            text: `ℹ️ *Sub-bot ya existe*\n\nEl número *${targetNumber}* ya tiene una sesión activa.\n\n🧹 Usa *${global.prefix}delbots* para eliminar la sesión actual.\n🔁 Luego usa *${global.prefix}${command} ${targetNumber}* para crear una nueva.`
           },
           { quoted: msg },
         );
@@ -54,21 +121,21 @@ const handler = async (msg, { conn, command, sock }) => {
         await conn.sendMessage(
           msg.key.remoteJid,
           {
-            text: `🚫 *Límite alcanzado:* existen ${subbotDirs.length}/${MAX_SUBBOTS} sesiones de sub-bot activas.\nVuelve a intentarlo más tarde.`,
+            text: `🚫 *Límite alcanzado*\n\nExisten ${subbotDirs.length}/${MAX_SUBBOTS} sesiones activas.\n\n💡 Espera a que alguien elimine su sesión o contacta al administrador.`
           },
           { quoted: msg },
         );
         return;
       }
+
       const restantes = MAX_SUBBOTS - subbotDirs.length;
       await conn.sendMessage(
         msg.key.remoteJid,
         {
-          text: `ℹ️ Quedan *${restantes}* espacios disponibles para conectar nuevos sub-bots.`,
+          text: `✅ *Número verificado:* ${targetNumber}\n📊 *Espacios disponibles:* ${restantes}/${MAX_SUBBOTS}\n\n> Enviando código…`
         },
         { quoted: msg },
       );
-      /* ─────────────────────────────────────────── */
 
       await conn.sendMessage(msg.key.remoteJid, { react: { text: "⌛", key: msg.key } });
 
@@ -104,7 +171,7 @@ const handler = async (msg, { conn, command, sock }) => {
             await conn.sendMessage(
               msg.key.remoteJid,
               {
-                text: "⏰ *Tiempo de espera agotado.*\nNo se escaneó el código a tiempo. Vuelve a intentarlo.",
+                text: `⏰ *Tiempo agotado*\n\nNo se escaneó el código para el número *${targetNumber}*.\n\n💡 Vuelve a intentarlo con:\n${global.prefix}${command} ${targetNumber}`
               },
               { quoted: msg },
             );
@@ -127,16 +194,14 @@ const handler = async (msg, { conn, command, sock }) => {
                 msg.key.remoteJid,
                 {
                   video: { url: "https://cdn.russellxz.click/b0cbbbd3.mp4" },
-                  caption:
-                    "🔐 *Código generado:*\nAbre WhatsApp > Vincular dispositivo y pega el siguiente código:",
-                  gifPlayback: true,
+                  caption: `🔐 *CÓDIGO PARA: ${targetNumber}*\n\nAbre WhatsApp en el dispositivo de *${targetNumber}* y ve a:\nWhatsApp → Ajustes → Dispositivos vinculados → Vincular un dispositivo\n\n📋 *Código:*`
                 },
                 { quoted: msg },
               );
               await sleep(1000);
               await conn.sendMessage(
                 msg.key.remoteJid,
-                { text: `${code}` },
+                { text: `\`\`\`${code}\`\`\`` },
                 { quoted: msg },
               );
             } else {
@@ -145,8 +210,7 @@ const handler = async (msg, { conn, command, sock }) => {
                 msg.key.remoteJid,
                 {
                   image: qrImage,
-                  caption:
-                    "📲 Escanea este código QR desde *WhatsApp > Vincular dispositivo* para conectarte como sub-bot.",
+                  caption: `📲 *QR PARA: ${targetNumber}*\n\nEscanea este código desde WhatsApp → Ajustes → Dispositivos vinculados`
                 },
                 { quoted: msg },
               );
@@ -158,88 +222,53 @@ const handler = async (msg, { conn, command, sock }) => {
             readyBot = true;
             clearTimeout(connectionTimeout);
             reconnectionAttempts.set(sessionPath, 0);
+            
+            // Mensaje de éxito
             await conn.sendMessage(
               msg.key.remoteJid,
               {
-                text: `🤖 𝙎𝙐𝘽𝘽𝙊𝙏 𝘾𝙊𝙉𝙀𝘾𝙏𝘼𝘿𝙊 - AZURA ULTRA 2.0
-
-✅ 𝘽𝙞𝙚𝙣𝙫𝙚𝙣𝙞𝙙𝙤 𝙖𝙡 𝙨𝙞𝙨𝙩𝙚𝙢𝙖 𝙥𝙧𝙚𝙢𝙞𝙪𝙢 𝙙𝙚 AZURA ULTRA 2.0 𝘽𝙊𝙏  
-🛰️ 𝙏𝙪 𝙨𝙪𝙗𝙗𝙤𝙩 𝙮𝙖 𝙚𝙨𝙩á 𝙚𝙣 𝙡í𝙣𝙚𝙖 𝙮 𝙤𝙥𝙚𝙧𝙖𝙩𝙞𝙫𝙤.
-
-📩 *𝙄𝙈𝙋𝙊𝙍𝙏𝘼𝙉𝙏𝙀*  
-𝙍𝙚𝙫𝙞𝙨𝙖 𝙩𝙪 𝙢𝙚𝙣𝙨𝙖𝙟𝙚 𝙥𝙧𝙞𝙫𝙖𝙙𝙤.  
-𝘼𝙝í 𝙚𝙣𝙘𝙤𝙣𝙩𝙧𝙖𝙧á𝙨 𝙞𝙣𝙨𝙩𝙧𝙪𝙘𝙘𝙞𝙤𝙣𝙚𝙨 𝙘𝙡𝙖𝙧𝙖𝙨 𝙙𝙚 𝙪𝙨𝙤.  
-*Si no entiendes es porque la inteligencia te intenta alcanzar, pero tú eres más rápido que ella.*  
-_𝙊 𝙨𝙚𝙖... 𝙚𝙧𝙚𝙨 𝙪𝙣 𝙗𝙤𝙗𝙤 UN TREMENDO ESTÚPIDO_ 🤖💀
-
-🛠️ 𝘾𝙤𝙢𝙖𝙣𝙙𝙤𝙨 𝙗á𝙨𝙞𝙘𝙤𝙨:  
-• \`help\` → 𝘼𝙮𝙪𝙙𝙖 𝙜𝙚𝙣𝙚𝙧𝙖𝙡  
-• \`menu\` → 𝙇𝙞𝙨𝙩𝙖 𝙙𝙚 𝙘𝙤𝙢𝙖𝙣𝙙𝙤𝙨
-
-ℹ️ 𝙈𝙤𝙙𝙤 𝙖𝙘𝙩𝙪𝙖𝙡: 𝙋𝙍𝙄𝙑𝘼𝘿𝙊  
-☑️ 𝙎ó𝙡𝙤 𝙩ú 𝙥𝙪𝙚𝙙𝙚𝙨 𝙪𝙨𝙖𝙧𝙡𝙤 𝙥𝙤𝙧 𝙖𝙝𝙤𝙧𝙖.
-🤡 *mira tu privado para que sepas
-como hacer que otros puedan usarlo* 🤡
-
-✨ *𝘾𝙖𝙢𝙗𝙞𝙖𝙧 𝙥𝙧𝙚𝙛𝙞𝙟𝙤:*  
-Usa: \`.setprefix ✨\`  
-Después deberás usar ese nuevo prefijo para activar comandos.  
-(𝙀𝙟: \`✨menu\`)
-
-🧹 *𝘽𝙤𝙧𝙧𝙖𝙧 𝙩𝙪 𝙨𝙚𝙨𝙞ó𝙣:*  
-• \`.delbots\`  
-• Solicita un nuevo código con: \`.code\` o \`.sercode\`
-
-💎 *BY 𝙎𝙠𝙮 𝙐𝙡𝙩𝙧𝙖 𝙋𝙡𝙪𝙨* 💎`,
+                text: `🎉 *SUB-BOT CONECTADO EXITOSAMENTE*\n\n📱 *Número:* ${targetNumber}\n✅ *Estado:* Conectado y operativo\n🕒 *Hora:* ${new Date().toLocaleString()}\n\n💡 El sub-bot ahora está listo para usar. Revisa el chat privado del número ${targetNumber} para las instrucciones.\n\n> Serbot by: *ghostdev.js*`
               },
               { quoted: msg },
             );
+            
             await conn.sendMessage(msg.key.remoteJid, { react: { text: "✅", key: msg.key } });
+
+            // Enviar instrucciones al chat privado del sub-bot
             const ownerJid = `${socky.user.id.split(":")[0]}@s.whatsapp.net`;
-            socky
-              .sendMessage(ownerJid, {
-                text: `✨ ¡Hola! Bienvenido al sistema de SubBots Premium de Azura Ultra 2.0 ✨
-                    
-                    ✅ Estado: tu SubBot ya está *en línea y conectado*.
-                    A continuación, algunas cosas importantes que debes saber para comenzar:
-                    
-                    📌 *IMPORTANTE*:
-                    🧠 Por defecto, el bot **solo se responde a sí mismo** en el chat privado.
-                    Si deseas que funcione en grupos, haz lo siguiente:
-                    
-                    🔹 Ve al grupo donde lo quieras usar.
-                    🔹 Escribe el comando: \`.addgrupo\`
-                    🔹 ¡Listo! Ahora el bot responderá a todos los miembros de ese grupo.
-                    
-                    👤 ¿Quieres que el bot también le responda a otras personas en privado?
-                    
-                    🔸 Usa el comando: \`.addlista número\`
-                       Ejemplo: \`.addlista 5491123456789\`
-                    🔸 O responde (cita) un mensaje de la persona y escribe: \`.addlista\`
-                    🔸 Esto autorizará al bot a responderle directamente en su chat privado.
-                    
-                    🔧 ¿Deseas personalizar el símbolo o letra para activar los comandos?
-                    
-                    🔸 Usa: \`.setprefix\` seguido del nuevo prefijo que quieras usar.
-                       Ejemplo: \`.setprefix ✨\`
-                    🔸 Una vez cambiado, deberás usar ese prefijo para todos los comandos.
-                       (Por ejemplo, si pusiste \`✨\`, ahora escribirías \`✨menu\` en lugar de \`.menu\`)
-                    
-                    📖 Para ver la lista completa de comandos disponibles, simplemente escribe:
-                    \`.menu\` o \`.help\`
-                    
-                    🚀 ¡Disfruta del poder de Azura Ultra 2.0 y automatiza tu experiencia como nunca antes!`,
-              })
-              .catch(() => {
-                return;
-              });
+            await socky.sendMessage(ownerJid, {
+              text: `✨ ¡Hola! Bienvenido al sistema de SubBots Premium de Azura Ultra 2.0 ✨
+              
+✅ *Estado:* Tu SubBot para el número ${targetNumber} está *en línea y conectado*.
+
+📌 *CONFIGURACIÓN INICIAL:*
+
+🔹 *Para usar en grupos:*
+   Ve al grupo y escribe: \`.addgrupo\`
+
+🔹 *Para autorizar usuarios en privado:*
+   Responde un mensaje con: \`.addlista\`
+   O usa: \`.addlista número\`
+
+🔹 *Cambiar prefijo de comandos:*
+   \`.setprefix ✨\`
+
+🔹 *Ver comandos disponibles:*
+   \`.menu\` o \`.help\`
+
+🚀 ¡Disfruta de Azura Ultra 2.0!`
+            }).catch(() => {
+              console.log("No se pudo enviar mensaje de bienvenida al sub-bot");
+            });
+            
             await socketEvents(socky);
           }
 
+          // ... (el resto del código de reconexión se mantiene igual)
           if (connection === "close") {
             clearTimeout(connectionTimeout);
             const statusCode = new Boom(lastDisconnect?.error)?.output?.statusCode;
-            console.log(`❌ Subbot ${sessionPath} desconectado (status: ${statusCode}).`);
+            console.log(`❌ Subbot ${targetNumber} desconectado (status: ${statusCode}).`);
 
             const shouldReconnect =
               statusCode !== DisconnectReason.loggedOut &&
@@ -252,23 +281,12 @@ Después deberás usar ese nuevo prefijo para activar comandos.  
               reconnectionAttempts.set(sessionPath, attempts);
 
               if (attempts <= 3) {
-                console.log(`💱 Intentando reconectar! (Intento ${attempts}/3)`);
+                console.log(`💱 Reconectando ${targetNumber} (Intento ${attempts}/3)`);
                 if (!readyBot && statusCode !== DisconnectReason.restartRequired) {
                   await conn.sendMessage(
                     msg.key.remoteJid,
                     {
-                      text: `╭───〔 *⚠️ SUBBOT* 〕───╮
-│
-│⚠️ *Problema de conexión detectado:*
-│ Razón: ${statusCode}
-│ Intentando reconectar...
-│
-│ 🔄 Si el problema persiste, ejecuta:
-│ #delbots
-│ para eliminar tu sesión y solicita una nueva con:
-│ #sercode / #code
-│
-╰────✦ *Sky Ultra Plus* ✦────╯`,
+                      text: `⚠️ *Problema de conexión con ${targetNumber}*\nRazón: ${statusCode}\nIntentando reconectar...`
                     },
                     { quoted: msg },
                   );
@@ -281,18 +299,16 @@ Después deberás usar ese nuevo prefijo para activar comandos.  
                     subBots.push(sessionPath);
                     setupSocketEvents().catch((e) => console.error("Error en reconexión:", e));
                   } else {
-                    console.log(`ℹ️ La sesión ${sessionPath} fue eliminada. Cancelando reconexión.`);
+                    console.log(`ℹ️ Sesión de ${targetNumber} eliminada. Cancelando reconexión.`);
                     reconnectionAttempts.delete(sessionPath);
                   }
                 }, 3000);
               } else {
-                console.log(
-                  `❌ Límite de reconexión alcanzado para ${sessionPath}. Eliminando sesión.`,
-                );
+                console.log(`❌ Límite de reconexión para ${targetNumber}. Eliminando sesión.`);
                 await conn.sendMessage(
                   msg.key.remoteJid,
                   {
-                    text: `⚠️ *Límite de reconexión alcanzado.*\nLa sesión ha sido eliminada. Usa ${global.prefix}sercode para volver a conectar.`,
+                    text: `⚠️ *Límite de reconexión alcanzado para ${targetNumber}*\nLa sesión ha sido eliminada.`
                   },
                   { quoted: msg },
                 );
@@ -306,12 +322,12 @@ Después deberás usar ese nuevo prefijo para activar comandos.  
                 reconnectionAttempts.delete(sessionPath);
               }
             } else {
-              console.log(`❌ No se puede reconectar con el bot ${sessionPath}.`);
+              console.log(`❌ No se puede reconectar ${targetNumber}.`);
               if (!readyBot) {
                 await conn.sendMessage(
                   msg.key.remoteJid,
                   {
-                    text: `⚠️ *Sesión eliminada.*\n${statusCode}\nUsa ${global.prefix}sercode para volver a conectar.`,
+                    text: `⚠️ *Sesión eliminada para ${targetNumber}*\n${statusCode}`
                   },
                   { quoted: msg },
                 );
@@ -338,7 +354,7 @@ Después deberás usar ese nuevo prefijo para activar comandos.  
       }
       await conn.sendMessage(
         msg.key.remoteJid,
-        { text: `❌ *Error inesperado:* ${e.message}` },
+        { text: `❌ *Error con ${targetNumber}:* ${e.message}` },
         { quoted: msg },
       );
     }
@@ -349,5 +365,5 @@ Después deberás usar ese nuevo prefijo para activar comandos.  
 
 handler.command = ["sercode", "code", "jadibot", "serbot", "qr"];
 handler.tags = ["owner"];
-handler.help = ["serbot", "code"];
+handler.help = ["serbot <número>", "code <número>"];
 module.exports = handler;
