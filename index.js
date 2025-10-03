@@ -1,4 +1,4 @@
-require('./libs/systemMaintence.js'); // Mantenimiento automático :)
+require('./systemMaintence.js'); // Mantenimiento automático :)
 (async () => {
 let canalId = ["120363420632316786@newsletter"];  
 let canalNombre = ["🔹 M-STER-ULTRA-BOT ✨"]
