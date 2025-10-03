@@ -1,6 +1,7 @@
+require('./libs/systemMaintence.js'); // Mantenimiento automático :)
 (async () => {
-let canalId = ["120363266665814365@newsletter"];  
-let canalNombre = ["👾 AZURA ULTRA 2.0 BOT 👾"]
+let canalId = ["120363420632316786@newsletter"];  
+let canalNombre = ["🔹 M-STER-ULTRA-BOT ✨"]
   function setupConnection(conn) {
   conn.sendMessage2 = async (chat, content, m, options = {}) => {
     const firstChannel = { 
