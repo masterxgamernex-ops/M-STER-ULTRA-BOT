@@ -38,8 +38,9 @@ const handler = async (msg, { conn }) => {
 ╭─❍ 𓂃 𝑺𝒖𝒃𝒃𝒐𝒕 𝑷𝒆𝒓𝒔𝒐𝒏𝒂𝒍𝒊𝒛𝒂𝒅𝒐 ❍─╮
 │   𝙈𝙚𝙣𝙪́: *${nombreMenu}*
 ╰────────────────────╯
-— 🔹 ya lo subbots tienen nuevos comandos : 
-use .menu y
+— 🔹 ya lo subbots tienen rpg de personajes y mascotas y puedes  
+— 🔹 subirlo de nivel para ver los comando usar el rpg usa: 
+✦ ${usedPrefix}menurpg  
 — 🔹 veras todo lo que ocupas saber.
 
 ┏━━🧠 𝗜𝗻𝘁𝗲𝗹𝗶𝗴𝗲𝗻𝗰𝗶𝗮
@@ -99,8 +100,9 @@ use .menu y
 ╔⌬ ${nombreMenu}⌬╗
 ║   Menú por categorías  
 ╚═──────────────────═╝
-— 🔹 ya lo subbots tienen nuevos comandos usa: 
-✦ ${usedPrefix}menu  
+— 🔹 ya lo subbots tienen rpg de personajes y mascotas y puedes  
+— 🔹 subirlo de nivel para ver los comando usar el rpg usa: 
+✦ ${usedPrefix}menurpg  
 — 🔹 veras todo lo que ocupas saber.
 
 〔 👇Haz Que Tus Amigos Sean *SUBBOTS* También Diles Que Envíen Estos Comandos👇 〕
@@ -187,13 +189,13 @@ use .menu y
 ▣ ${usedPrefix}delmenu ↷
   quita lo personalizado
 
-═⌬ M-STER ULTRA  Subbot ⌬═`.trim();
+═⌬ AZURA ULTRA 2.0 Subbot ⌬═`.trim();
     }
 
     await conn.sendMessage(
       msg.key.remoteJid,
       {
-        image: imageBuffer ? imageBuffer : { https://cdn.russellxz.click/afdc7aae.jpeg` },
+        image: imageBuffer ? imageBuffer : { url: `https://cdn.russellxz.click/654e40ee.jpeg` },
         caption,
       },
       { quoted: msg }
