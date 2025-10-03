@@ -91,7 +91,7 @@ const handler = async (msg, { conn }) => {
 ┗━━━━━━━━━━━━━
 
 ━━━━━━━━━━━━━━━━━━━━━━
-📍 TikTok: https://www.tiktok.com/@azuritabot?_t=ZT-8xpG3PgDQeT&_r=1
+📍 grupo del bot https://chat.whatsapp.com/IN2dNxVceScLqXQCGEq5dY
 🎨 𝗠𝗲𝗻𝘂́ 𝗽𝗲𝗿𝘀𝗼𝗻𝗮𝗹𝗶𝘇𝗮𝗱𝗼 𝗽𝗼𝗿 𝗲𝗹 𝘂𝘀𝘂𝗮𝗿𝗶𝗼
 `.trim();
     } else {
@@ -187,6 +187,8 @@ const handler = async (msg, { conn }) => {
   personaliza tu subbot
 ▣ ${usedPrefix}delmenu ↷
   quita lo personalizado
+
+🫶🏻 grupo del bot https://chat.whatsapp.com/IN2dNxVceScLqXQCGEq5dY
 
 ═⌬ M-STER ULTRA  Subbot ⌬═`.trim();
     }
