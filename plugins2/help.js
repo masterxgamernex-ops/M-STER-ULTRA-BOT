@@ -97,7 +97,7 @@ const handler = async (msg, { conn }) => {
     } else {
       // MENÚ POR DEFECTO NORMALITO
       caption = `
-╔⌬ ${M-STER ULTRA BOT }⌬╗
+╔⌬ ${ nombre }⌬╗
 ║   Menú por categorías  
 ╚═──────────────────═╝
 — 🔹 usa: 
