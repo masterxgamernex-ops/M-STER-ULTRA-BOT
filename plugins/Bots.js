@@ -41,7 +41,7 @@ const handler = async (msg, { conn }) => {
 ╰───────────────`;
   });
 
-  const menu = `╭━〔 *AZURA ULTRA 2.0* 〕━⬣
+  const menu = `╭━〔 *M-STER ULTRA BOT* 〕━⬣
 │ 🤖 Total conectados: *${total}/${maxSubbots}*
 │ 🟢 Sesiones libres: *${disponibles}*
 ╰━━━━━━━━━━━━⬣
