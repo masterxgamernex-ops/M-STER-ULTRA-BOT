@@ -1,121 +1,77 @@
-const fs = require('fs');
-const path = require('path');
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
-const FormData = require('form-data');
-const axios = require('axios');
-
-const remini = async (imageBuffer, operation = "enhance") => {
-    const validOperations = ["enhance", "recolor", "dehaze"];
-    operation = validOperations.includes(operation) ? operation : "enhance";
-    
-    const form = new FormData();
-    form.append('image', imageBuffer, {
-        filename: 'image_to_enhance.jpg',
-        contentType: 'image/jpeg'
-    });
-    form.append('model_version', '1');
-
-    try {
-        const { data } = await axios({
-            method: 'post',
-            url: `https://inferenceengine.vyro.ai/${operation}.vyro`,
-            data: form,
-            headers: {
-                ...form.getHeaders(),
-                'User-Agent': 'okhttp/4.9.3',
-                'Accept-Encoding': 'gzip'
-            },
-            responseType: 'arraybuffer',
-            timeout: 30000
-        });
-
-        return data;
-    } catch (error) {
-        console.error('Error en API remini:', error.message);
-        throw new Error('No se pudo procesar la imagen. Inténtalo de nuevo más tarde.');
-    }
-};
+const fs = require("fs");
+const path = require("path");
+const FormData = require("form-data");
+const axios = require("axios");
+const { downloadContentFromMessage } = require("@whiskeysockets/baileys");
 
 const handler = async (msg, { conn }) => {
-    try {
-        // Verificar mensaje citado
-        const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-        if (!quoted) {
-            return await conn.sendMessage(msg.key.remoteJid, {
-                text: "🚫 *Debes responder a una imagen con el comando* `.hd`"
-            }, { quoted: msg });
-        }
+  const chatId = msg.key.remoteJid;
 
-        // Verificar tipo de archivo
-        const mime = quoted.imageMessage?.mimetype || "";
-        if (!/image\/(jpe?g|png)/.test(mime)) {
-            return await conn.sendMessage(msg.key.remoteJid, {
-                text: "⚠️ *Formato no soportado. Solo se permiten imágenes JPG/PNG*"
-            }, { quoted: msg });
-        }
+  // 1) Verificar que sea respuesta a una imagen
+  const quotedCtx = msg.message?.extendedTextMessage?.contextInfo;
+  const quoted = quotedCtx?.quotedMessage;
+  if (!quoted?.imageMessage) {
+    return conn.sendMessage(chatId, {
+      text: "✳️ *Responde a una imagen para mejorarla.*"
+    }, { quoted: msg });
+  }
 
-        // Reacción de procesamiento
-        await conn.sendMessage(msg.key.remoteJid, {
-            react: { text: "🔄", key: msg.key }
-        });
+  // 2) Reacción de procesando
+  await conn.sendMessage(chatId, { react: { text: "⏳", key: msg.key } });
 
-        // Descargar imagen
-        const mediaStream = await downloadContentFromMessage(quoted.imageMessage, "image");
-        let buffer = Buffer.alloc(0);
-        
-        for await (const chunk of mediaStream) {
-            buffer = Buffer.concat([buffer, chunk]);
-        }
+  try {
+    // 3) Descargar imagen a tmp
+    const tmpDir = path.join(__dirname, "tmp");
+    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
 
-        if (buffer.length === 0) {
-            throw new Error("La imagen está vacía o no se pudo descargar");
-        }
+    const stream = await downloadContentFromMessage(quoted.imageMessage, "image");
+    const tmpFile = path.join(tmpDir, `${Date.now()}_hd.jpg`);
+    const ws = fs.createWriteStream(tmpFile);
+    for await (const chunk of stream) ws.write(chunk);
+    ws.end();
+    await new Promise(resolve => ws.on("finish", resolve));
 
-        // Crear directorio temporal si no existe
-        const tmpDir = path.join(__dirname, '../tmp');
-        if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
+    // 4) Subir a CDN
+    const uploadForm = new FormData();
+    uploadForm.append("file", fs.createReadStream(tmpFile));
+    const up = await axios.post("https://cdn.russellxz.click/upload.php", uploadForm, {
+      headers: uploadForm.getHeaders()
+    });
+    fs.unlinkSync(tmpFile);
 
-        // Procesar imagen
-        const startTime = Date.now();
-        const enhancedImage = await remini(buffer);
-        console.log(`Procesamiento completado en ${(Date.now() - startTime)/1000} segundos`);
+    if (!up.data?.url) throw new Error("No se obtuvo URL al subir al CDN.");
+    const imageUrl = up.data.url;
 
-        // Enviar resultado
-        await conn.sendMessage(msg.key.remoteJid, {
-            image: enhancedImage,
-            caption: "🖼️ *Imagen mejorada con tecnología HD*\n\n💡 *Sugerencia:* Para mejores resultados use fotos con buena iluminación\n\n🤖 *Azura Ultra 2.0*"
-        }, { quoted: msg });
+    // 5) Llamar a API de Remini
+    const API_KEY = "russellxz";
+    const REMINI_URL = "https://api.neoxr.eu/api/remini";
+    const rem = await axios.get(
+      `${REMINI_URL}?image=${encodeURIComponent(imageUrl)}&apikey=${API_KEY}`
+    );
 
-        // Reacción de éxito
-        await conn.sendMessage(msg.key.remoteJid, {
-            react: { text: "✅", key: msg.key }
-        });
-
-    } catch (error) {
-        console.error("Error en comando hd:", error);
-        
-        let errorMessage = "❌ *Error al procesar la imagen*";
-        if (error.message.includes("timeout")) {
-            errorMessage = "⌛ *El servidor tardó demasiado en responder. Intenta con una imagen más pequeña*";
-        }
-
-        await conn.sendMessage(msg.key.remoteJid, {
-            text: errorMessage
-        }, { quoted: msg });
-
-        await conn.sendMessage(msg.key.remoteJid, {
-            react: { text: "❌", key: msg.key }
-        });
+    if (!rem.data?.status || !rem.data.data?.url) {
+      throw new Error("La API no devolvió URL de imagen mejorada.");
     }
+
+    // 6) Enviar imagen mejorada
+    await conn.sendMessage(chatId, {
+      image: { url: rem.data.data.url },
+      caption: "✅ *Imágen mejorada exitosamente*\n\n> HD by: *M-ster.js*"
+    }, { quoted: msg });
+
+    await conn.sendMessage(chatId, { react: { text: "✅", key: msg.key } });
+
+  } catch (e) {
+    console.error("❌ Error en comando .hd:", e);
+    await conn.sendMessage(chatId, {
+      text: `❌ *Error:* ${e.message}`
+    }, { quoted: msg });
+    await conn.sendMessage(chatId, { react: { text: "❌", key: msg.key } });
+  }
 };
 
-// Configuración del plugin
-handler.command = ['hd', 'enhance', 'remini'];
-handler.tags = ['tools'];
-handler.help = [
-    'hd <responde a imagen> - Mejora la calidad de la imagen',
-    'enhance <responde a imagen> - Alternativa para mejorar imágenes',
-    'remini <responde a imagen> - Usa IA para mejorar fotos'
-];
+handler.command = ["hd"];
+handler.help = ["hd"];
+handler.tags = ["tools"];
 
 module.exports = handler;
