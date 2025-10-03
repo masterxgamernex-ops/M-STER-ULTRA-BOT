@@ -50,7 +50,7 @@ module.exports = async (msg, { conn, text }) => {
 
   const caption = `
 ╔═══════════════╗
-║✦ 𝘼𝙕𝙐𝙍𝘼 SUBBOTS✦
+║✦ M-STER SUBBOTS✦
 ╚═══════════════╝
 📀 Info del video:
 ╭───────────────╮
@@ -71,7 +71,7 @@ module.exports = async (msg, { conn, text }) => {
 ┣ 🎥 ${pref}play6 ${text}
 ┗ ⚠️ ${pref}ff
 ═════════════════════
-   𖥔 Azura SUBBOTS𖥔
+   𖥔 M-STER SUBBOTS𖥔
 ═════════════════════`.trim();
 
   // envía preview
