@@ -3438,7 +3438,7 @@ case 'menuowner': {
 
     const chatId = msg.key.remoteJid;
     const captionText = `╔═══════════╗  
-║    𝘼𝙕𝙐𝙍𝘼 𝙐𝙇𝙏𝙍𝘼      
+║    M-STER ULTRA BOT       
 ╚═══════════╝  
 
             𝐌𝐄𝐍𝐔 𝐎𝐖𝐍𝐄𝐑  
@@ -3475,17 +3475,17 @@ case 'menuowner': {
 
       𝗗𝗲𝘀𝗮𝗿𝗿𝗼𝗹𝗹𝗮𝗱𝗼 𝗽𝗼𝗿: ʳᵘˢˢᵉˡˡ ˣᶻ  
 
-         𝙖𝙯𝙪𝙧𝙖 𝙪𝙡𝙩𝙧𝙖`;
+         M-ster ultra bot`;
 
     const videoResponse = await axios.get(
-      "https://cdn.russellxz.click/83229a2d.jpeg",
+      "https://cdn.russellxz.click/4ade67c2.jpeg",
       { responseType: 'arraybuffer' }
     );
 
 await sock.sendMessage2(
   chatId,
   {
-    image: { url: "https://cdn.russellxz.click/83229a2d.jpeg" }, 
+    image: { url: "https://cdn.russellxz.click/0cd05c98.jpeg" }, 
     caption: captionText 
   },
   msg 
@@ -3603,7 +3603,7 @@ case 'menu': {
 
     const chatId = msg.key.remoteJid;
     const captionText = `╔═════════════╗  
-║ 𝐀𝐙𝐔𝐑𝐀 𝐔𝐋𝐓𝐑𝐀  
+║ M-STER ULTRA BOT   
 ║   🤖 𝘼𝙎𝙄𝙎𝙏𝙀𝙉𝙏𝙀 🤖     
 ╚═════════════╝  
 
@@ -3772,17 +3772,16 @@ case 'menu': {
 ⎔ ${global.prefix}Neko
 
 ╭─────────────────╮  
- ✦ 𝘼𝙕𝙐𝙍𝘼 𝙐𝙇𝙏𝙍𝘼 𝙀𝙎𝙏Á 𝙀𝙉 𝘾𝙊𝙉𝙎𝙏𝘼𝙉𝙏𝙀 𝘿𝙀𝙎𝘼𝙍𝙍𝙊𝙇𝙇𝙊. 
-  𝙎𝙀 𝘼𝙂𝙍𝙀𝙂𝘼𝙍Á𝙉 𝙈Á𝙎 𝙁𝙐𝙉𝘾𝙄𝙊𝙉𝙀𝙎 𝙋𝙍𝙊𝙉𝙏𝙊.   
+ ✦ M-STER ULTRA BOT .   
 ╰─────────────────╯  
 
-👨‍💻 𝘿𝙚𝙨𝙖𝙧𝙧𝙤𝙡𝙡𝙖𝙙𝙤 𝙥𝙤𝙧 𝙍𝙪𝙨𝙨𝙚𝙡𝙡 𝙓𝙕`;
+👨‍💻 𝘿𝙚𝙨𝙖𝙧𝙧𝙤𝙡𝙡𝙖𝙙𝙤 𝙥𝙤𝙧 WILKER S`;
 
     // Enviar usando sendMessage2
     await sock.sendMessage2(
   chatId,
   {
-    image: { url: "https://cdn.russellxz.click/752ef2f1.jpeg" }, 
+    image: { url: "https://cdn.russellxz.click/0cd05c98.jpeg" }, 
     caption: captionText 
   },
   msg 
@@ -3806,7 +3805,7 @@ case 'menugrupo': {
 
     const chatId = msg.key.remoteJid;
     const captionText = `╔════════════════╗  
-║  𝐀𝐙𝐔𝐑𝐀 𝐔𝐋𝐓𝐑𝐀             
+║  M-STER ULTRA BOT              
 ║   🎭 𝙼𝙴𝙽𝚄 𝙳𝙴 𝙶ℝ𝚄𝙿𝙾 🎭    
 ╚════════════════╝  
 
@@ -3859,7 +3858,7 @@ case 'menugrupo': {
 
 📌 𝐌Á𝐒 𝐂𝐎𝐌𝐀𝐍𝐃𝐎𝐒 𝐏𝐑Ó𝐗𝐈𝐌𝐀𝐌𝐄𝐍𝐓𝐄...
 
-⟢ 𝐀𝐙𝐔𝐑𝐀 𝐔𝐋𝐓𝐑𝐀 ⟣`;
+⟢ M-STER ULTRA BOT  ⟣`;
 
     const videoResponse = await axios.get("https://cdn.russellxz.click/c113150e.jpeg", { 
       responseType: 'arraybuffer' 
@@ -3868,7 +3867,7 @@ case 'menugrupo': {
     await sock.sendMessage2(
   chatId,
   {
-    image: { url: "https://cdn.russellxz.click/c113150e.jpeg" }, 
+    image: { url: "https://cdn.russellxz.click/4ade67c2.jpeg" }, 
     caption: captionText 
   },
   msg
@@ -13632,11 +13631,11 @@ case 'info':
       react: { text: "ℹ️", key: msg.key }
     });
 
-    const infoMessage = `╭─ *🤖 AZURA ULTRA* ─╮
+    const infoMessage = `╭─ *🤖 M-STER ULTRA* ─╮
 │ 🔹 *Prefijo actual:* ${global.prefix}
-│ 👑 *Dueño:* Russell xz
+│ 👑 *Dueño:* wilker s
 │ 🛠️ *Bot desarrollado desde cero* con la ayuda de Chatgpt.
-│ 🚀 *Creado por:* Russell
+│ 🚀 *Creado por:* wilker s
 │  
 ├─〔 📥 *Descargas Redes* 〕─
 │ 📌 *IG, TikTok y FB*  
@@ -13719,7 +13718,7 @@ case "pong":
 
         // Enviar mensaje con imagen y detalles del servidor
         await sock.sendMessage(msg.key.remoteJid, {
-            image: { url: "https://cdn.dorratz.com/files/1740372224017.jpg" }, 
+            image: { url: "https://cdn.russellxz.click/96e37e3f.jpeg" }, 
             caption: `🏓 *Ping! El bot está activo.*\n\n` +
                      `📅 *Fecha y hora actual:* ${formattedDate}\n\n` +
                      `🕒 *Tiempo Activo:* ${uptimeFormatted}\n\n` +
@@ -14059,9 +14058,9 @@ case "perfil": {
 }
 
 case 'creador': {
-    const ownerNumber = "15167096032@s.whatsapp.net"; // Número del dueño en formato WhatsApp
-    const ownerName = "Russell xz 🤖"; // Nombre del dueño
-    const messageText = "📞 *Contacto del Creador:*\n\nSi tienes dudas, preguntas o sugerencias sobre el bot, puedes contactar a mi creador.\n\n📌 *Nombre:* Russell\n📌 *Número:* +1 (516) 709-6032\n💬 *Mensaje directo:* Pulsa sobre el contacto y chatea con él.";
+    const ownerNumber = "584125877491@s.whatsapp.net"; // Número del dueño en formato WhatsApp
+    const ownerName = "wilker s 🤖"; // Nombre del dueño
+    const messageText = "📞 *Contacto del Creador:*\n\nSi tienes dudas, preguntas o sugerencias sobre el bot, puedes contactar a mi creador.\n\n📌 *Nombre:* wilker s 📌 *Número:* +584125877491\n💬 *Mensaje directo:* Pulsa sobre el contacto y chatea con él.";
 
     // Enviar mensaje con el contacto del dueño
     await sock.sendMessage(msg.key.remoteJid, {
