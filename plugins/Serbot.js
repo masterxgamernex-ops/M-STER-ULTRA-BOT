@@ -193,7 +193,7 @@ const handler = async (msg, { conn, command, sock, args }) => {
               await conn.sendMessage(
                 msg.key.remoteJid,
                 {
-                  imajen: { url: "https://cdn.russellxz.click/900fd77d.jpeg" },
+                  video: { url: "https://cdn.russellxz.click/b0cbbbd3.mp4" },
                   caption: `🔐 *CÓDIGO PARA: ${targetNumber}*\n\nAbre WhatsApp en el dispositivo de *${targetNumber}* y ve a:\nWhatsApp → Ajustes → Dispositivos vinculados → Vincular un dispositivo\n\n📋 *Código:*`
                 },
                 { quoted: msg },
@@ -237,7 +237,7 @@ const handler = async (msg, { conn, command, sock, args }) => {
             // Enviar instrucciones al chat privado del sub-bot
             const ownerJid = `${socky.user.id.split(":")[0]}@s.whatsapp.net`;
             await socky.sendMessage(ownerJid, {
-              text: `✨ ¡Hola! Bienvenido al sistema de SubBots Premium de M-ster ultra Subbot✨
+              text: `✨ ¡Hola! Bienvenido al sistema de SubBots Premium de M-ster Ultra Bot ✨
               
 ✅ *Estado:* Tu SubBot para el número ${targetNumber} está *en línea y conectado*.
 
@@ -256,7 +256,7 @@ const handler = async (msg, { conn, command, sock, args }) => {
 🔹 *Ver comandos disponibles:*
    \`.menu\` o \`.help\`
 
-🚀 ¡Disfruta de M-ster Ultra bot!`
+🚀 ¡Disfruta de M-ster Ultra Bot!`
             }).catch(() => {
               console.log("No se pudo enviar mensaje de bienvenida al sub-bot");
             });
