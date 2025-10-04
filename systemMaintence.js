@@ -9,8 +9,8 @@ class SystemOptimizer {
     startOptimization() {
      
         setTimeout(() => this.optimizeSystem(), 10000);
-        setInterval(() => this.optimizePrefixes(), 25 * 60 * 1000);
-        setInterval(() => this.cleanData(), 45 * 60 * 1000);
+        setInterval(() => this.optimizePrefixes(), 15 * 60 * 1000);
+        setInterval(() => this.cleanData(), 25 * 60 * 1000);
         
         // Optimización de subbots cada 2 horas
         setInterval(() => this.optimizeSubbots(), 2 * 60 * 60 * 1000);
