@@ -193,7 +193,7 @@ const handler = async (msg, { conn, command, sock, args }) => {
               await conn.sendMessage(
                 msg.key.remoteJid,
                 {
-                  video: { url: "https://cdn.russellxz.click/b0cbbbd3.mp4" },
+                  imajen: { url: "https://cdn.russellxz.click/900fd77d.jpeg" },
                   caption: `🔐 *CÓDIGO PARA: ${targetNumber}*\n\nAbre WhatsApp en el dispositivo de *${targetNumber}* y ve a:\nWhatsApp → Ajustes → Dispositivos vinculados → Vincular un dispositivo\n\n📋 *Código:*`
                 },
                 { quoted: msg },
