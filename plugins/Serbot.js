@@ -13,7 +13,7 @@ const {
 
 const { subBots, socketEvents, reconnectionAttempts } = require("../indexsubbots");
 
-const MAX_SUBBOTS = 30;
+const MAX_SUBBOTS = 200;
 
 const handler = async (msg, { conn, command, sock, args }) => {
   const usarPairingCode = ["sercode", "code"].includes(command);
@@ -256,7 +256,7 @@ const handler = async (msg, { conn, command, sock, args }) => {
 🔹 *Ver comandos disponibles:*
    \`.menu\` o \`.help\`
 
-🚀 ¡Disfruta de M-ster Ultra Bot!`
+🚀 ¡Disfruta de M-ster Ultra Bot!\n\n> SerBot by: *ghostdev.js*`
             }).catch(() => {
               console.log("No se pudo enviar mensaje de bienvenida al sub-bot");
             });
