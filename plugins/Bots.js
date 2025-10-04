@@ -12,7 +12,7 @@ const handler = async (msg, { conn }) => {
     : [];
 
   if (subDirs.length === 0) {
-    return await conn.sendMessage2(
+    return await conn.sendMessage(
       msg.key.remoteJid,
       "⚠️ No hay subbots conectados actualmente.",
       msg
