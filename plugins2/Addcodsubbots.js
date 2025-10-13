@@ -49,7 +49,7 @@ const handler = async (msg, { conn, args }) => {
   const rawID = conn.user?.id || "";
   const subbotID = `${rawID.split(":")[0]}@s.whatsapp.net`;
   const jsonPath = path.resolve("./comandossubbots.json");
-
+  const jsonPath_2 = require('../stickers.json')
   let data = {};
   if (fs.existsSync(jsonPath)) {
     try {
